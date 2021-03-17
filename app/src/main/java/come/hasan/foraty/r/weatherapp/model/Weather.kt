@@ -10,6 +10,12 @@ data class Weather(
     val temperature: Temperature,
     @SerializedName("weather")
     val weatherCondition: List<WeatherCondition>,
+    @SerializedName("humidity")
+    val humidity:Int,
+    @SerializedName("rain")
+    val rain:Int=0,
+    @SerializedName("snow")
+    val snow:Int=0
 ){
     val date:Date
     get() {

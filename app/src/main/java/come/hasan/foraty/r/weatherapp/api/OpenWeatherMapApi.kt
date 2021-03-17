@@ -4,7 +4,7 @@ import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Url
 
-interface OpenweathermapApi {
+interface OpenWeatherMapApi {
     @GET
     fun fetchOneCallReport(
         @Url Url:String
