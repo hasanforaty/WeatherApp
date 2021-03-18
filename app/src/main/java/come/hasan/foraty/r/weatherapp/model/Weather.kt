@@ -8,7 +8,7 @@ data class Weather(
     private val time:Long,
     @SerializedName("temp")
     val temperature: Temperature,
-    @SerializedName("weather")
+    @SerializedName("weathers")
     val weatherCondition: List<WeatherCondition>,
     @SerializedName("humidity")
     val humidity:Int,

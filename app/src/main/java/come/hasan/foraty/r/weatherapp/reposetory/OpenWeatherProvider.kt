@@ -1,8 +1,10 @@
 package come.hasan.foraty.r.weatherapp.reposetory
 
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import come.hasan.foraty.r.weatherapp.MainActivity
 import come.hasan.foraty.r.weatherapp.api.OneCallReport
 import come.hasan.foraty.r.weatherapp.api.OpenWeatherMapApi
 import come.hasan.foraty.r.weatherapp.model.Weather
@@ -20,6 +22,7 @@ class OpenWeatherProvider private constructor(){
             return OpenWeatherProvider()
         }
     }
+
     private val openWeatherMapApi: OpenWeatherMapApi
     init {
         val retrofit= Retrofit.Builder()
@@ -28,17 +31,20 @@ class OpenWeatherProvider private constructor(){
             .build()
         openWeatherMapApi=retrofit.create(OpenWeatherMapApi::class.java)
     }
-    fun fetchOneCallForDesten(lat:Double,lon:Double): LiveData<List<Weather>> {
-        val result= MutableLiveData<List<Weather>>()
+
+    /**
+     * fetchOneCallForDesten get weathers object for given location
+     * @param lat latitude of chosen location
+     * @param lon longitude of chosen location
+     * @return response of retrofit for OneCallReport
+     */
+    fun fetchOneCallForDesten(lat:Double,lon:Double): Response<OneCallReport>? {
+        var result: Response<OneCallReport>? =null
         val url="https://api.openweathermap.org/data/2.5/onecall?lat=$lat&lon=$lon&units=metric&appid=$API_KEY"
         openWeatherMapApi.fetchOneCallReport(url).enqueue(object: Callback<OneCallReport> {
             override fun onResponse(call: Call<OneCallReport>, response: Response<OneCallReport>) {
-                val oneCallReport=response.body()
-                oneCallReport?.let {
-                    result.value=it.weatherForecast
-                }
+                result=response
             }
-
             override fun onFailure(call: Call<OneCallReport>, t: Throwable) {
                 Log.d(TAG,"Something Bad Happend ",t)
             }
