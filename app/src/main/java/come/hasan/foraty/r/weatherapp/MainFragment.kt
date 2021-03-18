@@ -21,7 +21,7 @@ import come.hasan.foraty.r.weatherapp.model.Weather
 import come.hasan.foraty.r.weatherapp.viewModel.ViewModel
 import java.net.URL
 
-class MainFragment: Fragment() {
+class MainFragment: Fragment(), SearchView.OnQueryTextListener {
 
     private lateinit var binding:FragmentViewBinding
     private lateinit var recyclerView:RecyclerView
@@ -52,19 +52,8 @@ class MainFragment: Fragment() {
         getCityIdButton=binding.cityId
         searchWidget=binding.searchView
 
-
-
-        val searchManager= getSystemService(requireContext(),SearchManager::class.java)
-        searchWidget.apply {
-            // Assumes current activity is the searchable activity
-            if (searchManager != null) {
-                setSearchableInfo(searchManager.getSearchableInfo(SearchableActivity().componentName))
-            }
-            isIconifiedByDefault = false // Do not iconify the widget; expand it by default
-        }
-
-
-
+        searchWidget.setOnQueryTextListener(this)
+        searchWidget.isSubmitButtonEnabled=true
 
         recyclerView.layoutManager=LinearLayoutManager(context)
         recyclerView.adapter=forecastAdepter
@@ -134,6 +123,18 @@ class MainFragment: Fragment() {
         }catch (exception:Exception){
             TODO(exception.toString())
         }
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        if (query != null&&query.isNotEmpty()) {
+            viewModel.updateAddress(query)
+
+        }
+        return true
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        return true
     }
 
 }

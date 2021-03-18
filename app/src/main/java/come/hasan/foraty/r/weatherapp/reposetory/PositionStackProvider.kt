@@ -1,8 +1,11 @@
 package come.hasan.foraty.r.weatherapp.reposetory
 
 import android.net.Uri
+import android.nfc.Tag
 import android.util.Log
 import android.webkit.URLUtil
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import come.hasan.foraty.r.weatherapp.api.PositionStackApi
 import come.hasan.foraty.r.weatherapp.api.PositionStackResponse
 import come.hasan.foraty.r.weatherapp.model.GeocodingAddress
@@ -29,23 +32,12 @@ class PositionStackProvider private constructor(){
             .build()
         postionApi=retrofit.create(PositionStackApi::class.java)
     }
-    fun fetchAddress(address:String):Response<PositionStackResponse>?{
+    fun fetchAddress(address:String):Call<PositionStackResponse>{
         val queryString=properStringQuery(address)
         val uri=URI+queryString
-        var result:Response<PositionStackResponse>?=null
-        postionApi.fetchAddress(uri).enqueue(object :Callback<PositionStackResponse>{
-            override fun onResponse(
-                call: Call<PositionStackResponse>,
-                response: Response<PositionStackResponse>
-            ) {
-                result=response
-            }
+        Log.d(TAG,"my Uri is $uri")
+       return postionApi.fetchAddress(uri)
 
-            override fun onFailure(call: Call<PositionStackResponse>, t: Throwable) {
-                Log.d(TAG,"Something Bad Happend ",t)
-            }
-        })
-        return result
     }
 
     private fun properStringQuery(query:String):String{

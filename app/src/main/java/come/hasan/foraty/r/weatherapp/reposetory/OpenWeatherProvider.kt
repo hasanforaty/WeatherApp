@@ -38,12 +38,16 @@ class OpenWeatherProvider private constructor(){
      * @param lon longitude of chosen location
      * @return response of retrofit for OneCallReport
      */
-    fun fetchOneCallForDesten(lat:Double,lon:Double): Response<OneCallReport>? {
-        var result: Response<OneCallReport>? =null
+    fun fetchOneCallForDesten(lat:Double,lon:Double): LiveData<OneCallReport> {
+        var result =MutableLiveData<OneCallReport>()
         val url="https://api.openweathermap.org/data/2.5/onecall?lat=$lat&lon=$lon&units=metric&appid=$API_KEY"
         openWeatherMapApi.fetchOneCallReport(url).enqueue(object: Callback<OneCallReport> {
             override fun onResponse(call: Call<OneCallReport>, response: Response<OneCallReport>) {
-                result=response
+                if(response.isSuccessful){
+                    result.postValue(response.body())
+                }else{
+                    Log.d(TAG,"server has some problem request didn't success")
+                }
             }
             override fun onFailure(call: Call<OneCallReport>, t: Throwable) {
                 Log.d(TAG,"Something Bad Happend ",t)

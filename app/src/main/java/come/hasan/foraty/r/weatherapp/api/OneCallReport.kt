@@ -5,5 +5,20 @@ import come.hasan.foraty.r.weatherapp.model.Weather
 
 data class OneCallReport(
     @SerializedName("daily")
-    val weatherForecast:List<Weather>
-)
+    val weatherForecast:Array<Weather>
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as OneCallReport
+
+        if (!weatherForecast.contentEquals(other.weatherForecast)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return weatherForecast.contentHashCode()
+    }
+}

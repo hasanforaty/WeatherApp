@@ -3,7 +3,6 @@ package come.hasan.foraty.r.weatherapp
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import come.hasan.foraty.r.weatherapp.reposetory.MainReposetory
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
