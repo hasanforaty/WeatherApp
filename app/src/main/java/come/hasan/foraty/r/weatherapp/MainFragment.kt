@@ -1,62 +1,62 @@
 package come.hasan.foraty.r.weatherapp
 
-import android.app.SearchManager
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Button
 import android.widget.SearchView
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
 import come.hasan.foraty.r.weatherapp.databinding.FragmentViewBinding
 import come.hasan.foraty.r.weatherapp.databinding.ListItemsBinding
 import come.hasan.foraty.r.weatherapp.model.Weather
-import come.hasan.foraty.r.weatherapp.viewModel.ViewModel
-import java.net.URL
+import come.hasan.foraty.r.weatherapp.reposetory.MainRepository
 
-class MainFragment: Fragment(), SearchView.OnQueryTextListener {
+private const val TAG = "MainFragment"
 
-    private lateinit var binding:FragmentViewBinding
-    private lateinit var recyclerView:RecyclerView
-    private lateinit var defaultReportButton:Button
+class MainFragment : Fragment(), SearchView.OnQueryTextListener {
+
+    private lateinit var binding: FragmentViewBinding
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var defaultReportButton: Button
     private lateinit var pickDateButton: Button
     private lateinit var getCityIdButton: Button
-    private lateinit var searchWidget:SearchView
-    private lateinit var viewModel: ViewModel
-    private val forecastAdepter=ForecastAdepter()
+    private lateinit var searchWidget: SearchView
+    private val forecastAdepter = ForecastAdepter()
+
+    private val reposetory = MainRepository.newInstance()
+    private var forecastLiveData = reposetory.forecasts
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding=DataBindingUtil.inflate(inflater,R.layout.fragment_view,container,false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_view, container, false)
         //init ViewModel
-        binding.viewModel= ViewModel.newInstance()
-        binding.lifecycleOwner=this@MainFragment
+        binding.lifecycleOwner = this@MainFragment.viewLifecycleOwner
 
-
-        viewModel= ViewModel.newInstance()
+        binding.reposetory = reposetory
 
         //implement View Objects
-        recyclerView=binding.recyclerView
-        defaultReportButton=binding.deReport
-        pickDateButton=binding.pickData
-        getCityIdButton=binding.cityId
-        searchWidget=binding.searchView
+        recyclerView = binding.recyclerView
+        defaultReportButton = binding.deReport
+        pickDateButton = binding.pickData
+        getCityIdButton = binding.cityId
+        searchWidget = binding.searchView
 
+        //putting Listener of Search widget to this fragment
         searchWidget.setOnQueryTextListener(this)
-        searchWidget.isSubmitButtonEnabled=true
+        //enabling search button
+        searchWidget.isSubmitButtonEnabled = true
 
-        recyclerView.layoutManager=LinearLayoutManager(context)
-        recyclerView.adapter=forecastAdepter
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView.adapter = forecastAdepter
 
         return binding.root
     }
@@ -66,75 +66,84 @@ class MainFragment: Fragment(), SearchView.OnQueryTextListener {
      */
     override fun onStart() {
         super.onStart()
-        viewModel.weathers.observe(this.viewLifecycleOwner){
-            forecastAdepter.submitList(it)
-        }
-    }
-
-    inner class ForecastHolder(private val bindingObject:ListItemsBinding):RecyclerView.ViewHolder(bindingObject.root){
-
-        fun binding(weather: Weather){
-            bindingObject.Temperature.text=weather.temperature.day.toString().plus(weather.temperature.type)
-            bindingObject.date.text=weather.date.toString()
-            bindingObject.humidity.text=weather.humidity.toString().plus("%")
-            if (weather.rain>0){
-                bindingObject.rain.text=weather.rain.toString().plus("%")
-            }else{
-                bindingObject.rain.visibility=View.GONE
-            }
-            if(weather.snow>0){
-                bindingObject.snow.text=weather.snow.toString().plus("%")
-            }else{
-                bindingObject.rain.visibility=View.GONE
-            }
-            val weatherConditionUrl=URL(weather.weatherCondition[0].pic)
-            val bitmap=getImageBitMapFromUrl(weatherConditionUrl)
-            bitmap?.let {
-                bindingObject.statueImage.setImageBitmap(bitmap)
+        forecastLiveData.observe(this.viewLifecycleOwner) {
+            it?.let {
+                Log.d(TAG, it.toString())
+                forecastAdepter.submitList(it)
             }
         }
+
     }
-    private object DiffUtilCallback:DiffUtil.ItemCallback<Weather>(){
+
+    //abstract method of SearchView.SetOnQueryTextListener
+    /**
+     * @param query final Text inputted in Search Widget
+     * @return do you handle the search of  Library need to handle it ?
+     */
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        if (query != null && query.isNotEmpty()) {
+            //setting repository to search for it
+            reposetory.fetchLocation(query)
+
+        }
+        return true
+    }
+    override fun onQueryTextChange(newText: String?): Boolean {
+        return true
+    }
+
+    /**
+     * DiffUtillCallback instance of DiffUtil.ItemCallback needed for ListAdapter
+     */
+    private object DiffUtilCallback : DiffUtil.ItemCallback<Weather>() {
         override fun areItemsTheSame(oldItem: Weather, newItem: Weather): Boolean {
-            return oldItem==newItem
+            return oldItem == newItem
         }
 
         override fun areContentsTheSame(oldItem: Weather, newItem: Weather): Boolean {
-            return oldItem==newItem
+            return oldItem == newItem
         }
 
     }
-    inner class ForecastAdepter:ListAdapter<Weather,ForecastHolder>(DiffUtilCallback){
+
+    /**
+     * ForecastHolder ViewHolder of Main recyclerView
+     * @param bindingObject instance of Binding Object related to View
+     */
+    inner class ForecastHolder(private val bindingObject: ListItemsBinding) :
+        RecyclerView.ViewHolder(bindingObject.root) {
+        //binding all of component
+        fun binding(weather: Weather) {
+            bindingObject.Temperature.text =
+                weather.temperature.day.toString().plus("C")
+            bindingObject.date.text = weather.date.toString()
+            bindingObject.humidity.text = getString(R.string.humidity,weather.humidity.toString()).plus("%")
+            bindingObject.rain.text = getString(R.string.rain,weather.rain.toString()).plus("%")
+            bindingObject.snow.text = getString(R.string.snow,weather.snow.toString()).plus("%")
+            //getting pic from Url and put it in statueImage
+            Picasso.get()
+                .load(weather.weatherCondition[0].pic)
+                .resize(50,50)
+                .into(bindingObject.statueImage)
+        }
+    }
+
+    /**
+     * ForecastAdapter Adapter of main recyclerView
+     */
+    inner class ForecastAdepter : ListAdapter<Weather, ForecastHolder>(DiffUtilCallback) {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ForecastHolder {
-            val view:ListItemsBinding=DataBindingUtil.inflate(layoutInflater,R.layout.list_items,parent,false)
+            val view: ListItemsBinding =
+                DataBindingUtil.inflate(layoutInflater, R.layout.list_items, parent, false)
             return ForecastHolder(view)
         }
 
         override fun onBindViewHolder(holder: ForecastHolder, position: Int) {
-            val weather=getItem(position)
+            val weather = getItem(position)
             holder.binding(weather)
         }
 
     }
-    fun getImageBitMapFromUrl(url:URL):Bitmap?{
-        try {
-            val urlStream=url.openConnection().getInputStream()
-         return BitmapFactory.decodeStream(urlStream)
-        }catch (exception:Exception){
-            TODO(exception.toString())
-        }
-    }
 
-    override fun onQueryTextSubmit(query: String?): Boolean {
-        if (query != null&&query.isNotEmpty()) {
-            viewModel.updateAddress(query)
-
-        }
-        return true
-    }
-
-    override fun onQueryTextChange(newText: String?): Boolean {
-        return true
-    }
 
 }

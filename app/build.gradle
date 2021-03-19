@@ -40,12 +40,15 @@ dependencies {
     //adding recyclerView
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     //adding Retrotif
-    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     //add Gson for transfer Json to Object
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
     //adding LiveDate
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    //adding picasso library for imageView
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
 
 
     implementation 'androidx.core:core-ktx:1.3.2'

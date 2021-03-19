@@ -5,4 +5,7 @@
     <string name="pickDataButton">Pick date</string>
     <string name="defaultReport">Next 5 day report</string>
     <string name="search_hint">address,cities,..</string>
+    <string name="rain">rain: %1$s</string>
+    <string name="snow">Snow: %1$s</string>
+    <string name="humidity">humidity: %1$s</string>
 </resources>

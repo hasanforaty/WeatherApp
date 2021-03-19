@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
      * navigation navigate to given fragment
      * @param fragment that we wanna go
      */
-    fun navigation(fragment:Fragment){
+    private fun navigation(fragment:Fragment){
         val currentFragment=supportFragmentManager.findFragmentById(R.id.fragment_container)
         if (currentFragment==null){
             supportFragmentManager
