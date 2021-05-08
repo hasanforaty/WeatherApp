@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">WeatherApp</string>
 
-    <string name="getCityId">City ID</string>
-    <string name="pickDataButton">Pick date</string>
-    <string name="defaultReport">Next 5 day report</string>
+    <string name="dailyReport">Daily Report</string>
+    <string name="hourlyReport">Hourly Report</string>
+    <string name="pickDate">Pick Date report</string>
     <string name="search_hint">address,cities,..</string>
     <string name="rain">rain: %1$s</string>
     <string name="snow">Snow: %1$s</string>

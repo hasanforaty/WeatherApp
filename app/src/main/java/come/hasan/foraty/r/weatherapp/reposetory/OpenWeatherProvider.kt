@@ -1,11 +1,9 @@
 package come.hasan.foraty.r.weatherapp.reposetory
 
-import androidx.lifecycle.MutableLiveData
 import come.hasan.foraty.r.weatherapp.api.OneCallReport
 import come.hasan.foraty.r.weatherapp.api.OpenWeatherMapApi
 import okhttp3.ConnectionSpec
 import okhttp3.OkHttpClient
-
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

@@ -23,9 +23,9 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private lateinit var binding: FragmentViewBinding
     private lateinit var recyclerView: RecyclerView
-    private lateinit var defaultReportButton: Button
+    private lateinit var dailyReportButton: Button
     private lateinit var pickDateButton: Button
-    private lateinit var getCityIdButton: Button
+    private lateinit var hourlyReportButton: Button
     private lateinit var searchWidget: SearchView
     private val forecastAdepter = ForecastAdepter()
 
@@ -45,9 +45,9 @@ class MainFragment : Fragment(), SearchView.OnQueryTextListener {
 
         //implement View Objects
         recyclerView = binding.recyclerView
-        defaultReportButton = binding.deReport
-        pickDateButton = binding.pickData
-        getCityIdButton = binding.cityId
+        dailyReportButton = binding.dailyForecast
+        pickDateButton = binding.pickDate
+        hourlyReportButton = binding.hourlyReport
         searchWidget = binding.searchView
 
         //putting Listener of Search widget to this fragment
